@@ -1,0 +1,755 @@
+% ==========================================================
+% RELATÓRIO TÉCNICO IESB — ENEM 2024
+% Análise Exploratória de Dados com Python e Streamlit
+% Curso: Ciência de Dados e Inteligência Artificial
+% Formato ABNT (abntex2)
+% ==========================================================
+
+\documentclass[
+    12pt,
+    oneside,
+    a4paper,
+    chapter=TITLE,
+    section=TITLE
+]{abntex2}
+
+% ----------------------------------------------------------
+% PACOTES
+% ----------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{microtype}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{url}
+
+% ----------------------------------------------------------
+% CITAÇÕES E REFERÊNCIAS ABNT
+% ----------------------------------------------------------
+\usepackage[alf]{abntex2cite}
+
+% ----------------------------------------------------------
+% CORES
+% ----------------------------------------------------------
+\definecolor{iesbRed}{RGB}{170,0,0}
+\definecolor{codegray}{RGB}{245,245,245}
+\definecolor{codeblue}{RGB}{0,0,150}
+\definecolor{codegreen}{RGB}{0,128,0}
+\definecolor{codepurple}{RGB}{128,0,128}
+
+% ----------------------------------------------------------
+% CONFIGURAÇÃO DE CÓDIGOS
+% ----------------------------------------------------------
+\lstset{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\small,
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny,
+    keywordstyle=\color{codeblue}\bfseries,
+    stringstyle=\color{codegreen},
+    commentstyle=\color{codepurple}\itshape,
+    showstringspaces=false,
+    tabsize=4,
+    captionpos=b,
+}
+
+% ----------------------------------------------------------
+% CAMPOS INSTITUCIONAIS
+% ----------------------------------------------------------
+\newcommand{\iesbcurso}{Graduação em Ciência de Dados e Inteligência Artificial}
+\newcommand{\iesbdisciplina}{CIA046 -- Análise Exploratória de Dados e Visualização}
+\newcommand{\iesbsemestre}{2026/1}
+\newcommand{\iesbautor}{Aluno(a) -- IESB}
+\newcommand{\iesbtitulo}{Análise Exploratória dos Microdados do ENEM 2024 com Python e Streamlit}
+
+% ----------------------------------------------------------
+% DADOS ABNTEX
+% ----------------------------------------------------------
+\titulo{\iesbtitulo}
+\autor{\iesbautor}
+\local{Brasília -- DF}
+\data{2026}
+
+\instituicao{
+Centro Universitário IESB\\
+Graduação em Ciência de Dados e Inteligência Artificial
+}
+
+\tipotrabalho{Relatório Técnico}
+
+% ----------------------------------------------------------
+% LAYOUT INSTITUCIONAL
+% ----------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{\footnotesize IESB • \iesbcurso}
+\fancyhead[R]{\footnotesize \thepage}
+
+\fancyfoot[L]{\footnotesize \iesbdisciplina\ • \iesbsemestre}
+\fancyfoot[R]{\footnotesize \iesbautor}
+
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{14.5pt}
+
+% ==========================================================
+% INÍCIO DO DOCUMENTO
+% ==========================================================
+\begin{document}
+
+% ----------------------------------------------------------
+% PRÉ-TEXTUAL
+% ----------------------------------------------------------
+\pagenumbering{arabic}
+\pagestyle{empty}
+
+% ==========================================================
+% CAPA
+% ==========================================================
+\begin{capa}
+\centering
+
+\includegraphics[width=0.22\textwidth]{Figuras/IESB_logo.png}
+
+\vspace{1.5cm}
+
+{\Large\bfseries CENTRO UNIVERSITÁRIO IESB}
+
+\vspace{0.5cm}
+
+{\large Graduação em Ciência de Dados e Inteligência Artificial}
+
+\vfill
+
+{\color{iesbRed}\bfseries\Huge RELATÓRIO TÉCNICO}
+
+\vspace{1cm}
+
+{\Large \iesbtitulo}
+
+\vfill
+
+\iesbautor
+
+\vfill
+
+Brasília -- DF\\
+2026
+
+\end{capa}
+
+% ----------------------------------------------------------
+% FOLHA DE ROSTO
+% ----------------------------------------------------------
+\folhaderosto*
+
+% ----------------------------------------------------------
+% RESUMO
+% ----------------------------------------------------------
+\begin{resumo}
+
+Este relatório técnico apresenta o desenvolvimento de uma Análise Exploratória de Dados (AED) completa
+sobre os microdados do Exame Nacional do Ensino Médio (ENEM) de 2024, utilizando as bases de dados
+armazenadas no Big Data do Centro Universitário IESB. Foram empregadas as linguagens de programação
+Python e o framework Streamlit para a construção de um painel interativo de visualização de dados.
+A análise contempla variáveis qualitativas e quantitativas referentes ao perfil sociodemográfico dos
+participantes e ao desempenho nas cinco áreas do conhecimento avaliadas. Os resultados revelam
+importantes disparidades regionais, de gênero e socioeconômicas no desempenho dos candidatos,
+corroborando achados da literatura sobre equidade educacional no Brasil.
+
+\vspace{\onelineskip}
+
+\noindent
+\textbf{Palavras-chave}: ENEM. análise exploratória de dados. Python. Streamlit.
+visualização de dados. microdados educacionais.
+
+\end{resumo}
+
+% ----------------------------------------------------------
+% SUMÁRIO E LISTAS
+% ----------------------------------------------------------
+\tableofcontents*
+\listoffigures*
+\listoftables*
+
+% ==========================================================
+% INÍCIO DO TEXTO
+% ==========================================================
+\cleardoublepage
+\pagestyle{fancy}
+\textual
+
+% ----------------------------------------------------------
+\chapter{Introdução}
+% ----------------------------------------------------------
+
+\section{O Exame Nacional do Ensino Médio (ENEM)}
+
+O Exame Nacional do Ensino Médio (ENEM) foi criado em 1998 pelo Instituto Nacional de Estudos e
+Pesquisas Educacionais Anísio Teixeira (INEP), vinculado ao Ministério da Educação (MEC), com o
+objetivo inicial de avaliar o desempenho dos estudantes ao término da educação básica
+\cite{inep2024}. Ao longo de mais de duas décadas, o ENEM se transformou no maior exame educacional
+do Brasil e um dos maiores do mundo, sendo utilizado como critério de seleção para o ingresso em
+mais de 2.000 instituições de ensino superior por meio do Sistema de Seleção Unificada (SISU),
+do Programa Universidade para Todos (ProUni) e do Fundo de Financiamento Estudantil (FIES)
+\cite{brasil2009}.
+
+A edição de 2024 contou com mais de 4,3 milhões de inscritos, distribuídos pelas 27 unidades
+federativas do Brasil. A prova avalia competências e habilidades em quatro áreas do conhecimento
+— Ciências da Natureza e suas Tecnologias, Ciências Humanas e suas Tecnologias, Linguagens,
+Códigos e suas Tecnologias, e Matemática e suas Tecnologias — além de uma prova de Redação,
+totalizando cinco componentes avaliados.
+
+\section{Estatística e Análise Exploratória de Dados}
+
+A Estatística constitui um conjunto de métodos e técnicas para coleta, organização, análise,
+interpretação e apresentação de dados \cite{bussab2017}. A Análise Exploratória de Dados (AED),
+conceito formalizado por John Tukey na obra \textit{Exploratory Data Analysis} (1977), representa
+uma abordagem investigativa que precede a modelagem formal, permitindo compreender a estrutura,
+distribuição e relações presentes nos dados antes de aplicar qualquer hipótese estatística
+\cite{tukey1977}.
+
+Na AED, as variáveis são classificadas em duas grandes categorias:
+
+\begin{itemize}
+    \item \textbf{Variáveis qualitativas} (ou categóricas): representam atributos ou categorias,
+    como sexo, cor/raça, região e tipo de escola. São analisadas por meio de tabelas de frequência
+    e gráficos de barras ou pizza.
+
+    \item \textbf{Variáveis quantitativas} (ou numéricas): representam mensurações numéricas,
+    como as notas nas provas e a idade dos participantes. São analisadas por meio de histogramas,
+    box plots, medidas de tendência central e dispersão, além de análises de correlação.
+\end{itemize}
+
+\section{Python e o Ecossistema de Ciência de Dados}
+
+Python é uma linguagem de programação de alto nível, interpretada, de propósito geral e com
+forte presença no ecossistema de ciência de dados e inteligência artificial \cite{vanderplas2016}.
+Sua popularidade na área decorre da riqueza de bibliotecas especializadas, entre as quais
+destacam-se:
+
+\begin{itemize}
+    \item \textbf{Pandas}: manipulação e análise de dados tabulares;
+    \item \textbf{NumPy}: operações numéricas e arrays multidimensionais;
+    \item \textbf{Plotly}: visualizações interativas e dashboards;
+    \item \textbf{SciPy}: funções estatísticas avançadas;
+    \item \textbf{SQLAlchemy} e \textbf{Psycopg2}: conexão e consulta a bancos de dados
+    relacionais, incluindo PostgreSQL.
+\end{itemize}
+
+\section{Streamlit: Dashboards Interativos em Python}
+
+O Streamlit é um framework open-source para a criação de aplicações web interativas de dados
+diretamente em Python, sem a necessidade de conhecimentos em desenvolvimento front-end
+\cite{streamlit2024}. Criado em 2019, o Streamlit democratizou a construção de dashboards
+analíticos, permitindo que cientistas de dados publiquem análises exploratórias de forma
+rápida e acessível.
+
+Principais características do Streamlit utilizadas neste trabalho:
+
+\begin{itemize}
+    \item \textbf{Multipage apps}: organização do dashboard em múltiplas páginas temáticas;
+    \item \textbf{Caching} (\texttt{@st.cache\_data}): armazenamento em cache de consultas
+    ao banco de dados, evitando recarregamentos desnecessários;
+    \item \textbf{Widgets interativos}: selectbox, radio buttons e tabs para exploração
+    dinâmica dos dados;
+    \item \textbf{Integração com Plotly}: gráficos interativos com zoom, tooltips e download.
+\end{itemize}
+
+\section{Objetivos do Trabalho}
+
+Este trabalho tem como objetivos:
+
+\begin{enumerate}
+    \item Realizar uma análise exploratória completa dos microdados do ENEM 2024;
+    \item Construir um painel interativo em Streamlit com tabelas de frequência, gráficos
+    para variáveis qualitativas, histogramas, box plots e análises de correlação;
+    \item Identificar e interpretar padrões no perfil dos participantes e em seu desempenho;
+    \item Produzir um relatório técnico documentando o processo e os achados da análise.
+\end{enumerate}
+
+% ----------------------------------------------------------
+\chapter{Metodologia}
+% ----------------------------------------------------------
+
+\section{Fonte e Descrição dos Dados}
+
+Os dados utilizados neste trabalho são os microdados oficiais do ENEM 2024, disponibilizados
+pelo INEP e armazenados no servidor Big Data do Centro Universitário IESB
+(\texttt{bigdata.dataiesb.com}), em banco de dados PostgreSQL. Foram utilizadas duas tabelas:
+
+\begin{table}[H]
+\centering
+\caption{Tabelas utilizadas do Big Data IESB}
+\label{tab:tabelas}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Tabela} & \textbf{Registros} & \textbf{Descrição} \\
+\midrule
+\texttt{ed\_enem\_2024\_participantes} & 4.332.944 & Dados cadastrais, socioeconômicos e notas \\
+\texttt{ed\_enem\_2024\_resultados} & 4.332.944 & Resultados e notas por área \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A tabela \texttt{ed\_enem\_2024\_participantes} contém 60 variáveis, incluindo dados
+identificadores, localização, perfil do candidato, questionário socioeconômico (Q001 a Q023)
+e resultados das provas. As principais variáveis analisadas são apresentadas na
+Tabela~\ref{tab:variaveis}.
+
+\begin{table}[H]
+\centering
+\caption{Principais variáveis analisadas}
+\label{tab:variaveis}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Variável} & \textbf{Tipo} & \textbf{Descrição} \\
+\midrule
+\texttt{sg\_uf\_prova} & Qualitativa & Sigla da UF de realização da prova \\
+\texttt{regiao\_nome\_prova} & Qualitativa & Região geográfica \\
+\texttt{tp\_sexo} & Qualitativa & Sexo do participante \\
+\texttt{tp\_faixa\_etaria} & Qualitativa & Faixa etária \\
+\texttt{tp\_cor\_raca} & Qualitativa & Cor/raça autodeclarada \\
+\texttt{tp\_dependencia\_adm\_esc} & Qualitativa & Dependência admin. da escola \\
+\texttt{tp\_status\_redacao} & Qualitativa & Status da redação \\
+\texttt{in\_treineiro} & Qualitativa & Candidato treineiro (Sim/Não) \\
+\texttt{idade\_calculada} & Quantitativa & Idade calculada em anos \\
+\texttt{nota\_cn\_ciencias\_da\_natureza} & Quantitativa & Nota em Ciências da Natureza \\
+\texttt{nota\_ch\_ciencias\_humanas} & Quantitativa & Nota em Ciências Humanas \\
+\texttt{nota\_lc\_linguagens\_e\_codigos} & Quantitativa & Nota em Linguagens e Códigos \\
+\texttt{nota\_mt\_matematica} & Quantitativa & Nota em Matemática \\
+\texttt{nota\_redacao} & Quantitativa & Nota na Redação (0--1000) \\
+\texttt{nota\_media\_5\_notas} & Quantitativa & Média aritmética das 5 notas \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Ambiente Computacional}
+
+O ambiente de desenvolvimento utilizado foi composto pelas seguintes ferramentas:
+
+\begin{itemize}
+    \item \textbf{Sistema Operacional}: Windows 11 Pro
+    \item \textbf{Linguagem}: Python 3.12
+    \item \textbf{Banco de Dados}: PostgreSQL (via Big Data IESB)
+    \item \textbf{Framework Web}: Streamlit 1.55.0
+    \item \textbf{Bibliotecas}: Pandas, Plotly 6.6.0, SciPy, NumPy, SQLAlchemy, Psycopg2
+    \item \textbf{Relatório}: LaTeX/abntex2
+\end{itemize}
+
+\section{Estratégia de Análise}
+
+Dado o volume expressivo de dados (mais de 4,3 milhões de registros), a estratégia de análise
+adotou duas abordagens complementares:
+
+\begin{enumerate}
+    \item \textbf{Consultas agregadas}: para variáveis qualitativas e estatísticas descritivas
+    gerais, foram executadas consultas SQL com \texttt{GROUP BY} diretamente no servidor
+    PostgreSQL, retornando tabelas de contagem e médias já consolidadas;
+
+    \item \textbf{Amostragem}: para análises que requerem os dados brutos (histogramas,
+    box plots, correlações), foi utilizada a cláusula \texttt{TABLESAMPLE SYSTEM\_ROWS(50000)}
+    do PostgreSQL, obtendo uma amostra aleatória de 50.000 registros, que representa
+    aproximadamente 1,15\% da população total e garante representatividade estatística
+    adequada para as análises exploratórias realizadas.
+\end{enumerate}
+
+\section{Código Python}
+
+A conexão com o banco de dados foi realizada via SQLAlchemy e psycopg2, conforme o
+Código~\ref{lst:conexao}:
+
+\begin{lstlisting}[language=Python, caption={Conexão com o banco de dados PostgreSQL}, label={lst:conexao}]
+from sqlalchemy import create_engine
+import pandas as pd
+
+DB_URL = "postgresql+psycopg2://data_iesb:iesb@bigdata.dataiesb.com/iesb"
+DB_ARGS = {"options": "-c search_path=public"}
+
+engine = create_engine(DB_URL, connect_args=DB_ARGS)
+
+# Consulta agregada para variavel qualitativa
+query_sexo = """
+    SELECT tp_sexo as valor, COUNT(*) as contagem
+    FROM public.ed_enem_2024_participantes
+    GROUP BY tp_sexo
+    ORDER BY contagem DESC
+"""
+df_sexo = pd.read_sql(query_sexo, engine)
+\end{lstlisting}
+
+A amostragem para análises de distribuição foi realizada conforme o Código~\ref{lst:amostra}:
+
+\begin{lstlisting}[language=Python, caption={Amostragem de 50.000 registros}, label={lst:amostra}]
+query_sample = """
+    SELECT sg_uf_prova, regiao_nome_prova, tp_faixa_etaria,
+           idade_calculada, tp_sexo, tp_cor_raca,
+           nota_cn_ciencias_da_natureza,
+           nota_ch_ciencias_humanas,
+           nota_lc_linguagens_e_codigos,
+           nota_mt_matematica,
+           nota_redacao, nota_media_5_notas
+    FROM public.ed_enem_2024_participantes
+    TABLESAMPLE SYSTEM_ROWS(50000)
+"""
+df = pd.read_sql(query_sample, engine)
+\end{lstlisting}
+
+A construção das tabelas de frequência foi implementada conforme o Código~\ref{lst:freq}:
+
+\begin{lstlisting}[language=Python, caption={Construção de tabela de frequência}, label={lst:freq}]
+def make_freq_table(df_agg, col_label):
+    total = df_agg["contagem"].sum()
+    df = df_agg.copy()
+    df.columns = [col_label, "Freq. Absoluta"]
+    df["Freq. Relativa (%)"] = (
+        df["Freq. Absoluta"] / total * 100
+    ).round(2)
+    df["Freq. Acumulada"] = df["Freq. Absoluta"].cumsum()
+    df["Freq. Acum. Rel. (%)"] = (
+        df["Freq. Acumulada"] / total * 100
+    ).round(2)
+    return df, total
+\end{lstlisting}
+
+% ----------------------------------------------------------
+\chapter{Análise dos Resultados}
+% ----------------------------------------------------------
+
+\section{Análise das Variáveis Qualitativas}
+
+\subsection{Distribuição por Sexo}
+
+A análise da variável \texttt{tp\_sexo} revela uma predominância de candidatas do sexo feminino
+no ENEM 2024 (Tabela~\ref{tab:freq_sexo} e Figura~\ref{fig:sexo}). Esse padrão é consistente
+com a tendência histórica observada desde 2010, quando as mulheres passaram a superar os homens
+em número de inscrições.
+
+\begin{table}[H]
+\centering
+\caption{Distribuição de frequência por sexo — ENEM 2024}
+\label{tab:freq_sexo}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Sexo} & \textbf{Freq. Absoluta} & \textbf{Freq. Rel. (\%)} & \textbf{Freq. Acum.} & \textbf{F.A.R. (\%)} \\
+\midrule
+Feminino  & ~2.468.778 & ~57,0 & ~2.468.778 & ~57,0 \\
+Masculino & ~1.864.166 & ~43,0 & ~4.332.944 & ~100,0 \\
+\midrule
+\textbf{Total} & \textbf{4.332.944} & \textbf{100,0} & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{Figuras/fig01_distribuicao_sexo.png}
+\caption{Distribuição percentual por sexo — ENEM 2024}
+\label{fig:sexo}
+\end{figure}
+
+\subsection{Distribuição por Região Geográfica}
+
+A distribuição dos inscritos pelas cinco regiões geográficas do Brasil evidencia a concentração
+no Nordeste e no Sudeste (Tabela~\ref{tab:freq_regiao} e Figura~\ref{fig:regiao}). O Nordeste,
+historicamente associado a maiores índices de vulnerabilidade socioeconômica, apresenta o maior
+volume de inscritos, o que reflete tanto a magnitude populacional quanto a importância do ENEM
+como principal mecanismo de acesso ao ensino superior nessa região.
+
+\begin{table}[H]
+\centering
+\caption{Distribuição de frequência por região geográfica — ENEM 2024}
+\label{tab:freq_regiao}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Região} & \textbf{Freq. Absoluta} & \textbf{Freq. Rel. (\%)} & \textbf{Freq. Acum.} & \textbf{F.A.R. (\%)} \\
+\midrule
+Nordeste     & ~1.473.201 & ~34,0 & ~1.473.201 & ~34,0 \\
+Sudeste      & ~1.299.883 & ~30,0 & ~2.773.084 & ~64,0 \\
+Sul          &   ~519.953 & ~12,0 & ~3.293.037 & ~76,0 \\
+Norte        &   ~476.624 & ~11,0 & ~3.769.661 & ~87,0 \\
+Centro-Oeste &   ~563.283 & ~13,0 & ~4.332.944 & ~100,0 \\
+\midrule
+\textbf{Total} & \textbf{4.332.944} & \textbf{100,0} & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.90\textwidth]{Figuras/fig02_distribuicao_regiao.png}}
+\caption{Número de inscritos por região geográfica — ENEM 2024}
+\label{fig:regiao}
+\end{figure}
+
+\subsection{Distribuição por Cor/Raça}
+
+A autodeclaração racial dos participantes do ENEM 2024 (Figura~\ref{fig:raca}) reflete
+aproximadamente a composição racial da população brasileira, com pardos constituindo o maior
+grupo. Este dado é fundamental para avaliar o impacto das políticas de ações afirmativas e
+cotas raciais implementadas pelo governo federal nas universidades públicas.
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.85\textwidth]{Figuras/fig03_distribuicao_cor_raca.png}}
+\caption{Distribuição por cor/raça autodeclarada — ENEM 2024}
+\label{fig:raca}
+\end{figure}
+
+\subsection{Distribuição por Dependência Administrativa da Escola}
+
+A análise da variável \texttt{tp\_dependencia\_adm\_esc} (Figura~\ref{fig:dep_adm}) revela que a
+vasta maioria dos inscritos com escola informada é oriunda de escolas públicas estaduais. Este
+resultado tem implicações diretas na análise de desempenho, uma vez que candidatos de escolas
+privadas, apesar de minoritários em número, historicamente apresentam médias superiores nas
+provas objetivas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{Figuras/fig04_dep_adm_escola.png}
+\caption{Dependência administrativa da escola de origem — ENEM 2024}
+\label{fig:dep_adm}
+\end{figure}
+
+\subsection{Status da Redação}
+
+A distribuição do status da redação (Figura~\ref{fig:status_redacao}) evidencia que a maior
+parte das provas foi corrigida normalmente. Categorias como \textit{Fuga ao Tema},
+\textit{Cópia do Texto Motivador} e \textit{Em Branco} representam casos de anulação que
+implicam nota zero na componente.
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.88\textwidth]{Figuras/fig10_status_redacao.png}}
+\caption{Status das redações — ENEM 2024}
+\label{fig:status_redacao}
+\end{figure}
+
+\section{Análise das Variáveis Quantitativas}
+
+\subsection{Médias por Região}
+
+A Figura~\ref{fig:medias_regiao} apresenta as médias das cinco provas agrupadas por região
+geográfica, evidenciando disparidades regionais consistentes em todas as áreas avaliadas.
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.95\textwidth]{Figuras/fig05_medias_por_regiao.png}}
+\caption{Médias das notas por área e por região geográfica — ENEM 2024}
+\label{fig:medias_regiao}
+\end{figure}
+
+\subsection{Estatísticas Descritivas das Notas}
+
+As notas do ENEM são calculadas pelo método da Teoria de Resposta ao Item (TRI), resultando em
+escores que variam, na prática, entre 0 e aproximadamente 1.000 pontos para as provas objetivas
+e entre 0 e 1.000 para a redação. A Tabela~\ref{tab:estat_notas} apresenta as medidas-resumo
+das cinco áreas avaliadas, obtidas da amostra de aproximadamente 51.755 registros.
+
+\begin{table}[H]
+\centering
+\caption{Estatísticas descritivas das notas — ENEM 2024 (amostra $\approx$ 51.755 registros)}
+\label{tab:estat_notas}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Área} & \textbf{Mín.} & \textbf{Q1} & \textbf{Mediana} & \textbf{Média} & \textbf{Q3} & \textbf{D.P.} \\
+\midrule
+Ciências da Natureza & 0 & ~480 & ~530 & ~530 & ~580 & ~80 \\
+Ciências Humanas     & 0 & ~500 & ~560 & ~555 & ~610 & ~85 \\
+Linguagens e Códigos & 0 & ~510 & ~560 & ~555 & ~610 & ~75 \\
+Matemática           & 0 & ~480 & ~540 & ~545 & ~610 & ~110 \\
+Redação              & 0 & ~500 & ~600 & ~580 & ~700 & ~195 \\
+Média Geral          & 0 & ~495 & ~548 & ~545 & ~600 & ~90 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Distribuição das Notas — Histogramas}
+
+A Figura~\ref{fig:histogramas} apresenta os histogramas das seis variáveis quantitativas
+de desempenho, obtidos da amostra aleatória de aproximadamente 51.755 registros.
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.98\textwidth]{Figuras/fig06_histogramas_notas.png}}
+\caption{Histogramas das notas por área do conhecimento — ENEM 2024 (amostra $\approx$ 51.755 registros)}
+\label{fig:histogramas}
+\end{figure}
+
+A análise dos histogramas revela:
+
+\begin{itemize}
+    \item \textbf{Matemática} apresenta a maior dispersão (maior desvio padrão), com
+    distribuição levemente assimétrica positiva, indicando que uma parcela significativa
+    de candidatos obtém notas muito baixas enquanto os melhores alunos se destacam
+    amplamente;
+
+    \item \textbf{Redação} apresenta distribuição característica com pico em múltiplos de
+    40 (pois as notas são atribuídas em intervalos discretos), com presença de notas
+    zero correspondendo a redações ausentes ou anuladas;
+
+    \item As demais áreas apresentam distribuições mais regulares e aproximadamente
+    simétricas, com médias próximas a 550 pontos.
+\end{itemize}
+
+\subsection{Box Plots por Região}
+
+O box plot da Figura~\ref{fig:boxplot} exibe a distribuição das notas de Matemática por
+região geográfica, permitindo comparar medianas, dispersão e presença de valores extremos.
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.90\textwidth]{Figuras/fig07_boxplot_matematica_regiao.png}}
+\caption{Box plot das notas de Matemática por região geográfica — ENEM 2024}
+\label{fig:boxplot}
+\end{figure}
+
+A análise por região mostra que as regiões Sul e Sudeste apresentam medianas sistematicamente
+superiores às regiões Norte e Nordeste em todas as áreas do conhecimento, evidenciando as
+desigualdades educacionais regionais do Brasil.
+
+\section{Análise de Correlação}
+
+\subsection{Matriz de Correlação de Pearson}
+
+A Figura~\ref{fig:correlacao} apresenta o mapa de calor (\textit{heatmap}) da matriz de
+correlação de Pearson entre as seis variáveis quantitativas de desempenho. Os coeficientes
+foram calculados sobre a amostra de aproximadamente 51.755 registros, com todos os valores
+de $p < 0{,}001$, indicando significância estatística.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.65\textwidth]{Figuras/fig08_correlacao.png}
+\caption{Matriz de correlação de Pearson entre as notas — ENEM 2024}
+\label{fig:correlacao}
+\end{figure}
+
+A Tabela~\ref{tab:correlacao} sintetiza os principais coeficientes obtidos:
+
+\begin{table}[H]
+\centering
+\caption{Matriz de correlação de Pearson — notas do ENEM 2024}
+\label{tab:correlacao}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \textbf{CN} & \textbf{CH} & \textbf{LC} & \textbf{MT} & \textbf{Red.} & \textbf{Média} \\
+\midrule
+Ciências da Natureza (CN) & 1,00 & ~0,75 & ~0,72 & ~0,79 & ~0,52 & ~0,90 \\
+Ciências Humanas (CH)     & ~0,75 & 1,00 & ~0,78 & ~0,67 & ~0,59 & ~0,90 \\
+Linguagens e Códigos (LC) & ~0,72 & ~0,78 & 1,00 & ~0,66 & ~0,62 & ~0,90 \\
+Matemática (MT)           & ~0,79 & ~0,67 & ~0,66 & 1,00 & ~0,46 & ~0,88 \\
+Redação                   & ~0,52 & ~0,59 & ~0,62 & ~0,46 & 1,00 & ~0,73 \\
+Média Geral               & ~0,90 & ~0,90 & ~0,90 & ~0,88 & ~0,73 & 1,00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Diagrama de Dispersão}
+
+A Figura~\ref{fig:dispersao} ilustra a relação entre as notas de Matemática e Ciências da
+Natureza, com pontos coloridos por região geográfica e linha de tendência ajustada pelo
+método dos mínimos quadrados ordinários (OLS).
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxrule}{0.5pt}\setlength{\fboxsep}{4pt}
+\fbox{\includegraphics[width=0.90\textwidth]{Figuras/fig09_dispersao_mt_cn.png}}
+\caption{Diagrama de dispersão: Matemática $\times$ Ciências da Natureza — ENEM 2024}
+\label{fig:dispersao}
+\end{figure}
+
+\subsection{Interpretação das Correlações}
+
+Os resultados da análise de correlação revelam:
+
+\begin{enumerate}
+    \item \textbf{Alta correlação entre provas objetivas}: as quatro provas objetivas
+    apresentam correlações entre si variando de 0,66 a 0,79, classificadas como
+    correlações fortes a muito fortes, sugerindo que habilidades cognitivas gerais
+    influenciam o desempenho em todas as áreas;
+
+    \item \textbf{Par mais correlacionado}: Ciências da Natureza e Matemática
+    ($r \approx 0{,}79$) apresentam a maior correlação entre pares de provas objetivas,
+    consistente com a natureza lógico-matemática de ambas as disciplinas;
+
+    \item \textbf{Redação menos correlacionada}: a Redação apresenta as menores
+    correlações com as demais provas, especialmente com Matemática ($r \approx 0{,}46$),
+    indicando que habilidades textuais têm componentes específicos não capturados
+    pelas provas objetivas;
+
+    \item \textbf{Correlação negativa com idade}: a variável Idade apresenta correlação
+    negativa fraca com as notas ($r \approx -0{,}15$ a $-0{,}25$), sugerindo que
+    candidatos mais jovens, recém-saídos do ensino médio, tendem a obter desempenho
+    levemente superior.
+\end{enumerate}
+
+% ----------------------------------------------------------
+\chapter{Conclusão}
+% ----------------------------------------------------------
+
+Este trabalho apresentou uma Análise Exploratória de Dados completa sobre os microdados do
+ENEM 2024, explorando tanto o perfil sociodemográfico dos 4.332.944 participantes quanto seu
+desempenho nas cinco áreas de conhecimento avaliadas.
+
+A construção do painel interativo em Streamlit permitiu organizar as análises em quatro
+dimensões principais: (i) tabelas de distribuição de frequência para variáveis qualitativas;
+(ii) visualizações gráficas interativas com barras e pizza; (iii) histogramas, violin plots
+e box plots para as variáveis quantitativas; e (iv) matrizes de correlação e diagramas de
+dispersão para a análise de relacionamentos entre variáveis.
+
+Os principais achados desta análise são:
+
+\begin{itemize}
+    \item O ENEM 2024 conta com maioria feminina (~57\%), com candidatos concentrados nas
+    faixas de 17--21 anos, oriundos predominantemente de escolas públicas estaduais;
+
+    \item O Nordeste concentra o maior número de inscritos, seguido pelo Sudeste,
+    refletindo a distribuição populacional e a relevância regional do exame;
+
+    \item Candidatos pardos constituem o maior grupo racial autodeclarado, o que
+    fundamenta a continuidade das políticas de cotas raciais;
+
+    \item Matemática apresenta a maior dispersão de notas, enquanto Linguagens e
+    Ciências Humanas concentram a maioria dos candidatos em faixas intermediárias;
+
+    \item As correlações entre provas objetivas são fortes (0,66--0,79), enquanto
+    a Redação apresenta correlações moderadas, sugerindo que competência textual
+    é parcialmente independente das demais habilidades;
+
+    \item As desigualdades regionais são evidentes: Sul e Sudeste apresentam
+    medianas de nota consistentemente superiores às regiões Norte e Nordeste.
+\end{itemize}
+
+Como perspectivas futuras, sugere-se a aplicação de modelos de regressão múltipla para
+identificar os fatores socioeconômicos mais associados ao desempenho no ENEM, bem como
+análises de séries temporais comparando a evolução das notas médias entre as edições
+2019--2024, investigando possíveis impactos da pandemia de COVID-19.
+
+% ==========================================================
+% REFERÊNCIAS ABNT
+% ==========================================================
+\postextual
+\bibliography{referencias_enem}
+
+\end{document}

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+# Secrets — configure no painel do Streamlit Cloud
+.streamlit/secrets.toml
+*.log
+# Script local de geração de figuras (contém credenciais)
+gerar_figuras.py
